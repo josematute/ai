@@ -17,6 +17,7 @@ In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
 
+from audioop import reverse
 import util
 
 class SearchProblem:
@@ -87,50 +88,73 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    from game import Directions
-    n = Directions.NORTH
-    s = Directions.SOUTH
-    e = Directions.EAST
-    w = Directions.WEST
-
     stack = util.Stack()
     visited = set()
+    print("Start:", problem.getStartState())
 
-    stack.push([problem.getStartState(), []])
+    stack.push((problem.getStartState(), []))
     # print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     
     while not stack.isEmpty():
-        currentState, directions = stack.pop()
-        # print([].append("lol"))
-        visited.add(currentState)
+        state = stack.pop()
+        currentState = state[0]
+        directions = state[1][:]
         if problem.isGoalState(currentState):
+            print(directions)
             return directions
-        for i, x in enumerate(problem.getSuccessors(currentState)):
-            if x[0] not in visited:
-                where = x[1]
-                if where == "North": where = 'n'
-                elif where == "South": where = 's'
-                elif where == "East": where = 'e'
-                elif where == "West": where = 'w'
 
-                directionsSoFar = directions
-                directionsSoFar.append(where)        
-                stack.push([x[0], directionsSoFar])
+        if currentState not in visited:
+            visited.add(currentState)
+            for x in problem.getSuccessors(currentState):
+                # print(x)
+                if x[0] not in visited:                    
+                    stack.push((x[0], directions + [x[1]]))
 
     # util.raiseNotDefined()
     
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    queue = util.Queue()
+    visited = set()
+
+    queue.push((problem.getStartState(), []))
+    while not queue.isEmpty():
+        state = queue.pop()
+        currentState = state[0]
+        directions = state[1][:]
+        if problem.isGoalState(currentState):
+            print(directions)
+            return directions
+
+        if currentState not in visited:
+            visited.add(currentState)
+            for x in problem.getSuccessors(currentState):
+                if x[0] not in visited:                    
+                    queue.push((x[0], directions + [x[1]]))
+    # util.raiseNotDefined()
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    pq = util.PriorityQueue()
+    visited = set()
+    pq.push((problem.getStartState(), []), 0)
+
+    while not pq.isEmpty():
+        state = pq.pop()
+        currentState = state[0]
+        directions = state[1][:]
+        currentCost = problem.getCostOfActions(directions)
+        if problem.isGoalState(currentState):
+            return directions
+
+        if currentState not in visited:
+            visited.add(currentState)
+            for x in problem.getSuccessors(currentState):
+                if x[0] not in visited:                    
+                    pq.push((x[0], directions + [x[1]]), currentCost + x[2])
+    # util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
     """
@@ -142,7 +166,23 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    pq = util.PriorityQueue()
+    visited = set()
+    pq.push((problem.getStartState(), []), 0)
+
+    while not pq.isEmpty():
+        state = pq.pop()
+        currentState = state[0]
+        directions = state[1][:]
+        currentCost = problem.getCostOfActions(directions)
+        if problem.isGoalState(currentState):
+            return directions
+
+        if currentState not in visited:
+            visited.add(currentState)
+            for x in problem.getSuccessors(currentState):
+                if x[0] not in visited:                
+                    pq.push((x[0], directions + [x[1]]), currentCost + x[2] + heuristic(x[0], problem))
 
 
 # Abbreviations
