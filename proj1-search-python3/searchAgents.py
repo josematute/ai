@@ -391,7 +391,7 @@ def cornersHeuristic(state, problem):
         heuristics.append(((coords[0] - corner[0]) ** 2 + (coords[1] - corner[1]) ** 2 ) ** 0.5)
 
         # ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
-    return max(heuristics)
+    return 0 if problem.isGoalState(state) else max(heuristics)
 
     # for corner in corners:
     #     for x in problem.getSuccessors(state):
@@ -492,8 +492,18 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
+    print(foodGrid)
     "*** YOUR CODE HERE ***"
-    return 0
+    coords = position
+    heuristics = []
+    for x in range(foodGrid.width):
+        for y in range(foodGrid.height):
+            # heuristics.append(manhattanDistance(coords, corner))
+            if foodGrid[x][y]:
+                heuristics.append(((coords[0] - x) ** 2 + (coords[1] - y) ** 2 ) ** 0.5)
+
+        # ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
+    return 0 if len(heuristics) == 0 else max(heuristics)
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
