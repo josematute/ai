@@ -90,27 +90,22 @@ def depthFirstSearch(problem):
     "*** YOUR CODE HERE ***"
     stack = util.Stack()
     visited = set()
-    print("Start:", problem.getStartState())
 
     stack.push((problem.getStartState(), []))
-    # print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     
     while not stack.isEmpty():
         state = stack.pop()
         currentState = state[0]
         directions = state[1][:]
         if problem.isGoalState(currentState):
-            print(directions)
             return directions
 
         if currentState not in visited:
             visited.add(currentState)
             for x in problem.getSuccessors(currentState):
-                # print(x)
                 if x[0] not in visited:                    
                     stack.push((x[0], directions + [x[1]]))
 
-    # util.raiseNotDefined()
     
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
@@ -119,12 +114,12 @@ def breadthFirstSearch(problem):
     visited = set()
 
     queue.push((problem.getStartState(), []))
+
     while not queue.isEmpty():
         state = queue.pop()
         currentState = state[0]
         directions = state[1][:]
         if problem.isGoalState(currentState):
-            print(directions)
             return directions
 
         if currentState not in visited:
@@ -132,13 +127,14 @@ def breadthFirstSearch(problem):
             for x in problem.getSuccessors(currentState):
                 if x[0] not in visited:                    
                     queue.push((x[0], directions + [x[1]]))
-    # util.raiseNotDefined()
+                    
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
     pq = util.PriorityQueue()
     visited = set()
+
     pq.push((problem.getStartState(), []), 0)
 
     while not pq.isEmpty():
@@ -154,7 +150,7 @@ def uniformCostSearch(problem):
             for x in problem.getSuccessors(currentState):
                 if x[0] not in visited:                    
                     pq.push((x[0], directions + [x[1]]), currentCost + x[2])
-    # util.raiseNotDefined()
+                    
 
 def nullHeuristic(state, problem=None):
     """
@@ -168,6 +164,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     "*** YOUR CODE HERE ***"
     pq = util.PriorityQueue()
     visited = set()
+    
     pq.push((problem.getStartState(), []), 0)
 
     while not pq.isEmpty():
