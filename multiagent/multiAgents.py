@@ -143,36 +143,44 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        def value(state, next, currentDepth=0, maxDepth=self.depth, evalFunc=self.evaluationFunction):
+        def value(state, next, currentDepth=0):
             currentDepth += 1
-            if state.isWin() or state.isLose():
-                return evalFunc(state)
+            if state.isWin() or state.isLose() or currentDepth == self.depth:
+                return self.evaluationFunction(state)
             elif next == "min":
-                min_value(state, currentDepth, maxDepth, evalFunc)
+                return min_value(state, currentDepth)
             else:
-                max_value(state, currentDepth, maxDepth, evalFunc)
+                return max_value(state, currentDepth)
 
-        def max_value(state, currentDepth, maxDepth, evalFunc): # pacman
+        def max_value(state, currentDepth): # pacman
             v = float('-inf')
+            bestAction = None
             for i in range(1, state.getNumAgents()):
                 successors = []
                 for action in state.getLegalActions(i):
-                    successors.append(state.generateSuccessor(i, action))
-                for successor in successors:
-                    v = max(v, value(successor, "min", currentDepth, maxDepth, evalFunc))
-            return v
+                    successors.append((state.generateSuccessor(i, action), action))
+                for successor, action in successors:
+                    successorValue = value(successor, "min", currentDepth)
+                    if successorValue > v:
+                        v = successorValue
+                        bestAction = action
+                    
+            return v, bestAction
 
-        def min_value(state, currentDepth, maxDepth, evalFunc): # ghost
+        def min_value(state, currentDepth): # ghost
             v = float('inf')
             successors = []
+            bestAction = None
             for action in state.getLegalActions(0):
-                successors.append(state.generateSuccessor(0, action))
-            for successor in successors:
-                v = min(v, value(successor, "max", currentDepth, maxDepth, evalFunc ))
-            return v
+                successors.append((state.generateSuccessor(0, action), action))
+            for successor, action in successors:
+                successorValue = value(successor, "max", currentDepth)
+                if successorValue < v:
+                    v = successorValue
+                    bestAction = action
+            return v, bestAction
 
-
-        return value(gameState, "max")
+        return value(gameState, "max")[1]
 
 
 
