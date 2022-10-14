@@ -12,6 +12,7 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
+from fileinput import close
 from util import manhattanDistance
 from game import Directions
 import random, util
@@ -74,36 +75,14 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        # print(newPos)
-        # print(newFood)
-        # print(newGhostStates)
-        # print(newScaredTimes)
-        foodDistance = []
-        foodAmount = 0
-        totalFoodDistance = 0
-        gdistance = 0
-        value = 0
+        closestFood = float('inf')
         for i in range(newFood.width):
             for j in range(newFood.height):
                 if newFood[i][j]:
-                    distance = manhattanDistance(newPos, (i,j))
-                    totalFoodDistance += distance
-                    foodAmount += 1
-                   
-        if foodAmount != 0:
-            averageDistance = totalFoodDistance / foodAmount
-            value -= averageDistance
+                    closestFood = min(closestFood, manhattanDistance(newPos, (i,j)))
 
-        for ghostState in newGhostStates:
-            gdistance += manhattanDistance(newPos, ghostState.getPosition())
-    
-        # totalScaredTimes = 0
-        # for time in newScaredTimes:
-        #     totalScaredTimes += time
+        return successorGameState.getScore() + (1/closestFood)
 
-        value += gdistance
-        return successorGameState.getScore() + value + newScaredTimes[0]
-        # return successorGameState.getScore() + value 
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -164,7 +143,38 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        def value(state, next, currentDepth=0, maxDepth=self.depth, evalFunc=self.evaluationFunction):
+            currentDepth += 1
+            if state.isWin() or state.isLose():
+                return evalFunc(state)
+            elif next == "min":
+                min_value(state, currentDepth, maxDepth, evalFunc)
+            else:
+                max_value(state, currentDepth, maxDepth, evalFunc)
+
+        def max_value(state, currentDepth, maxDepth, evalFunc): # pacman
+            v = float('-inf')
+            for i in range(1, state.getNumAgents()):
+                successors = []
+                for action in state.getLegalActions(i):
+                    successors.append(state.generateSuccessor(i, action))
+                for successor in successors:
+                    v = max(v, value(successor, "min", currentDepth, maxDepth, evalFunc))
+            return v
+
+        def min_value(state, currentDepth, maxDepth, evalFunc): # ghost
+            v = float('inf')
+            successors = []
+            for action in state.getLegalActions(0):
+                successors.append(state.generateSuccessor(0, action))
+            for successor in successors:
+                v = min(v, value(successor, "max", currentDepth, maxDepth, evalFunc ))
+            return v
+
+
+        return value(gameState, "max")
+
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
