@@ -154,25 +154,21 @@ class MinimaxAgent(MultiAgentSearchAgent):
         def max_val(state, currentDepth): # pacman
             v = float('-inf')
             bestAction = None
-            successors = []
             for action in state.getLegalActions(0):
-                successors.append((state.generateSuccessor(0, action), action))
-            for successor, successor_action in successors:
+                successor = state.generateSuccessor(0, action)
                 successor_v = value(successor, 1, currentDepth+1)[0]
                 if successor_v > v:
-                    v, bestAction = successor_v, successor_action
+                    v, bestAction = successor_v, action
             return (v, bestAction)
 
         def min_val(state, agentIndex, currentDepth): # ghost
             v = float('inf')
             bestAction = None
-            successors = []
             for action in state.getLegalActions(agentIndex):
-                successors.append((state.generateSuccessor(agentIndex, action), action))
-            for successor, successor_action in successors:
+                successor = state.generateSuccessor(agentIndex, action)
                 successor_v = value(successor, agentIndex+1, currentDepth+1)[0]
                 if successor_v < v:
-                    v, bestAction = successor_v, successor_action
+                    v, bestAction = successor_v, action
             return (v, bestAction)
 
         return max_val(gameState, 0)[1]
@@ -196,16 +192,14 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             else: 
                 return min_val(state, agentIndex, currentDepth, alpha, beta)
 
-        def max_val(state, currentDepth, alpha, beta): # pacman
+        def max_val(state, currentDepth, alpha=float('-inf'), beta=float('inf')): # pacman
             v = float('-inf')
             bestAction = None
-            successors = []
             for action in state.getLegalActions(0):
-                successors.append((state.generateSuccessor(0, action), action))
-            for successor, successor_action in successors:
+                successor = state.generateSuccessor(0, action)
                 successor_v = value(successor, 1, currentDepth+1, alpha, beta)[0]
                 if successor_v > v:
-                    v, bestAction = successor_v, successor_action
+                    v, bestAction = successor_v, action
                 if v > beta: return (v, bestAction)
                 alpha = max(alpha, v)
             return (v, bestAction)
@@ -213,18 +207,16 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         def min_val(state, agentIndex, currentDepth, alpha, beta): # ghost
             v = float('inf')
             bestAction = None
-            successors = []
             for action in state.getLegalActions(agentIndex):
-                successors.append((state.generateSuccessor(agentIndex, action), action))
-            for successor, successor_action in successors:
+                successor = state.generateSuccessor(agentIndex, action)
                 successor_v = value(successor, agentIndex+1, currentDepth+1, alpha, beta)[0]
                 if successor_v < v:
-                    v, bestAction = successor_v, successor_action
+                    v, bestAction = successor_v, action
                 if v < alpha: return (v, bestAction)
                 beta = min(beta, v)
             return (v, bestAction)
 
-        return max_val(gameState, 0, float('-inf'), float('inf'))[1]
+        return max_val(gameState, 0)[1]
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
