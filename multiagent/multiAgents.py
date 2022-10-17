@@ -269,7 +269,20 @@ def betterEvaluationFunction(currentGameState):
     DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # Useful information you can extract from a GameState (pacman.py)
+    newPos = currentGameState.getPacmanPosition()
+    newFood = currentGameState.getFood()
+    newGhostStates = currentGameState.getGhostStates()
+    newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+
+    "*** YOUR CODE HERE ***"
+    closestFood = float('inf')
+    for i in range(newFood.width):
+        for j in range(newFood.height):
+            if newFood[i][j]:
+                closestFood = min(closestFood, manhattanDistance(newPos, (i,j)))
+
+    return currentGameState.getScore() + (1/closestFood)
 
 # Abbreviation
 better = betterEvaluationFunction
