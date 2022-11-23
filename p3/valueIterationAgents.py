@@ -105,8 +105,7 @@ class ValueIterationAgent(ValueEstimationAgent):
             action_value = self.getQValue(state, action)
             if action_value > best_action_val:
                 best_action = action
-                best_action_val = action_value
-                
+                best_action_val = action_value 
         return best_action
         
 
